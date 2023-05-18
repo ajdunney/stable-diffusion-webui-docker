@@ -32,6 +32,7 @@
         }
     ],
     "family": "automatic1111-api",
+    "taskRoleArn": "arn:aws:iam::430472357735:role/AmazonECSTaskRoleS3FullAccess",
     "executionRoleArn": "arn:aws:iam::430472357735:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
     "revision": 1,
