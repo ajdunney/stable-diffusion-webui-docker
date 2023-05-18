@@ -95,6 +95,9 @@ negative_prompt = "deformed, bad anatomy, disfigured, poorly drawn face, mutatio
 
 print('Running interrogation...')
 result = (api.interrogate(img))
+print('Wait')
+api.util_wait_for_ready(check_interval=5.0)
+print('Not waiting anymore')
 print(result.info)
 pos_prompt = result.info.split(',')[0] + ', ' + pos_prompt
 print(pos_prompt)
