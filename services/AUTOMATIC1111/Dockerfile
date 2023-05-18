@@ -83,7 +83,7 @@ RUN \
   sed -i 's/in_app_dir = .*/in_app_dir = True/g' /usr/local/lib/python3.10/site-packages/gradio/routes.py && \
   git config --global --add safe.directory '*'
 
-RUN pip install webuiapi
+RUN pip install webuiapi boto3
 
 RUN apt-get update && \
 	apt-get install -y curl unzip && \
