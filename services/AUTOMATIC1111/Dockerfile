@@ -100,4 +100,4 @@ EXPOSE 7860
 ENTRYPOINT ["/docker/entrypoint.sh"]
 
 # CMD python -c "print('Hello')"
-CMD python -u webui.py --api --nowebui --listen --port 7860 ${CLI_ARGS}
+CMD python -u webui.py --api --no-half --use-cpu --nowebui --listen --port 7860 ${CLI_ARGS}
