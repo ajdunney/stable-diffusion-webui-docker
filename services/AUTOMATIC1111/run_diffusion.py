@@ -5,6 +5,7 @@ import sys
 from PIL import Image
 import boto3
 import datetime
+from datetime import timedelta
 from botocore.exceptions import NoCredentialsError
 
 
