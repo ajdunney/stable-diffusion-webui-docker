@@ -41,10 +41,11 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
   print(image_files)
   return print(random.choice(image_files))
 
-bucket_name = 'medieval-news-press/'
+bucket_name = 'medieval-news-press'
 s3_folder = 'inputs/'
 local_folder = 'saved/'
 min_size_kb = 30
+print('Checking bucketi...')
 selected_image = get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb)
 
 if selected_image is None:
