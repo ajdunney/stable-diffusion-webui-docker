@@ -76,6 +76,12 @@ RUN --mount=type=cache,target=/root/.cache/pip  pip install -U opencv-python-hea
 
 RUN pip install webuiapi boto3
 
+RUN apt-get update && \
+        apt-get install -y curl unzip && \
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+        unzip awscliv2.zip && \
+        ./aws/install
+
 COPY . /docker
 
 RUN \
@@ -84,12 +90,6 @@ RUN \
   # one of the ugliest hacks I ever wrote \
   sed -i 's/in_app_dir = .*/in_app_dir = True/g' /usr/local/lib/python3.10/site-packages/gradio/routes.py && \
   git config --global --add safe.directory '*'
-
-RUN apt-get update && \
-	apt-get install -y curl unzip && \
-	curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-	unzip awscliv2.zip && \
-	./aws/install
 
 WORKDIR ${ROOT}
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
