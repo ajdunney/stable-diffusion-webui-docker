@@ -9,11 +9,16 @@ from botocore.exceptions import NoCredentialsError
 
 
 def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
+  print(bucket_name, s3_folder, local_folder, min_size_kb)
   image_files = []
   s3 = boto3.client('s3')
-  week = datetime.datetime.now().strftime('%Y-%m-%d')
+  today = datetime.datetime.now()
+  last_monday = today - timedelta(days=today.weekday())
+  week = last_monday.strftime('%Y-%m-%d')
 
+  print(f'week: {week}')
   try:
+    print(f'Prefix: {s3_folder + week + "/images/"}')  
     s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=s3_folder + week + "/images/")
 
     if 'Contents' not in s3_objects:
@@ -42,7 +47,7 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
   return print(random.choice(image_files))
 
 bucket_name = 'medieval-news-press'
-s3_folder = 'inputs/'
+s3_folder = 'articles/'
 local_folder = 'saved/'
 min_size_kb = 30
 print('Checking bucket...')
