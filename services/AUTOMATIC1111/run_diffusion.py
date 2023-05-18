@@ -1,3 +1,5 @@
+import time
+
 import webuiapi
 import os
 import random
@@ -19,7 +21,7 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
 
   print(f'week: {week}')
   try:
-    print(f'Prefix: {s3_folder + week + "/images/"}')  
+    print(f'Prefix: {s3_folder + week + "/images/"}')
     s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=s3_folder + week + "/images/")
 
     if 'Contents' not in s3_objects:
@@ -32,7 +34,6 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
       if filename:  # Skip directories
         if filename.endswith(('.png', '.jpg', '.jpeg')):
           response = s3.head_object(Bucket=bucket_name, Key=file_path)
-          print(response['ContentLength'])
           if response['ContentLength'] > min_size_kb * 1024:  # size in bytes
             image_files.append(file_path)
             # s3.download_file(bucket_name, object['Key'], local_filename)
@@ -75,7 +76,13 @@ api = webuiapi.WebUIApi(host='0.0.0.0',
                         port=7860,
                         sampler='Euler a',
                         steps=20)
-#
+
+for _ in range(10):
+    try:
+        api.util_wait_for_ready(check_interval=5.0)
+    except:
+        print('Waiting...')
+        time.sleep(10)
 
 pos_prompt = "in the style of <lora:medieval_nocap_14repeats_v5-000019:1.1> (ohnx medieval)," \
              "drawing, painting, colorful"
