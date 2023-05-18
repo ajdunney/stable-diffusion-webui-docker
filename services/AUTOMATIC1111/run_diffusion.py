@@ -27,12 +27,14 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
       return
 
     for object in s3_objects['Contents']:
+      file_path = object['Key']
       filename = object['Key'].rsplit('/', 1)[-1]  # Extract the filename from the S3 object key
       if filename:  # Skip directories
-        local_filename = os.path.join(local_folder, filename)
-        if file.endswith(('.png', '.jpg', '.jpeg')):
-          if os.path.getsize(full_path) > min_size_kb * 1024:  # size in bytes
-            image_files.append(full_path)
+        if filename.endswith(('.png', '.jpg', '.jpeg')):
+          response = s3.head_object(Bucket=bucket_name, Key=file_path)
+          print(response['ContentLength'])
+          if response['ContentLength'] > min_size_kb * 1024:  # size in bytes
+            image_files.append(file_path)
             # s3.download_file(bucket_name, object['Key'], local_filename)
             # print(f'Downloaded {filename} from S3 bucket {bucket_name}.')
 
@@ -44,8 +46,11 @@ def get_images_from_s3(bucket_name, s3_folder, local_folder, min_size_kb):
     print('No AWS credentials found.')
     return
 
-  print(image_files)
-  return print(random.choice(image_files))
+  random_file = random.choice(image_files)
+  filename = random_file.rsplit("/", 1)[-1]
+  print(f'Save image to {filename}')
+  s3.download_file(bucket_name, random_file, f'./{filename}')
+  return filename
 
 bucket_name = 'medieval-news-press'
 s3_folder = 'articles/'
@@ -58,9 +63,8 @@ if selected_image is None:
     print("No suitable image files found.")
     sys.exit()
 else:
-    print(f"Selected image: {selected_image}")
     print('Opening...')
-    img = Image.open(selected_image)
+    img = Image.open('./' + selected_image)
 
 # create API client
 api = webuiapi.WebUIApi()
