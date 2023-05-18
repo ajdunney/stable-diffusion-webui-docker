@@ -15,7 +15,12 @@
                 }
             ],
             "essential": true,
-            "environment": [],
+	    "environment": [
+                {
+                    "name": "DEPLOY_ENV",
+                    "value": "AWS"
+                }
+	    ],
             "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
