@@ -35,7 +35,7 @@ RUN --mount=type=cache,target=/cache --mount=type=cache,target=/root/.cache/pip 
 
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-  git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git && \
+  git clone https://github.com/ajdunney/stable-diffusion-webui.git && \
   cd stable-diffusion-webui && \
   git reset --hard d7aec59c4eb02f723b3d55c6f927a42e97acd679 && \
   pip install -r requirements_versions.txt
@@ -99,4 +99,4 @@ EXPOSE 7860
 
 ENTRYPOINT ["/docker/entrypoint.sh"]
 
-CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 200 && python /docker/run_diffusion.py
+CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 30 && python /docker/run_diffusion.py
