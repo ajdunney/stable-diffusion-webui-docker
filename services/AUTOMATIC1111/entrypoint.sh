@@ -77,6 +77,7 @@ if [[ $DEPLOY_ENV == "AWS" ]]; then
   # Fetch images and weights from S3
   aws s3 cp s3://medieval-news-press/weights/StableDiffusion/ /stable-diffusion-webui/models/Stable-diffusion/ --recursive
   aws s3 cp s3://medieval-news-press/weights/BLIP/ /stable-diffusion-webui/models/BLIP/ --recursive
+  aws s3 cp s3://medieval-news-press/weights/Lora/ /stable-diffusion-webui/models/Lora/ --recursive
 fi
 
 if [[ $DEPLOY_ENV == "LOCAL" ]]; then
