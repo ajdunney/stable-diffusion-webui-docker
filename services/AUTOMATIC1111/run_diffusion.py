@@ -53,21 +53,25 @@ def get_images_from_s3(bucket_name, s3_folder, min_size_kb):
   return filename
 
 
-def upload_image_to_s3(bucket_name, s3_folder):
+def upload_image_to_s3(bucket_name, file_name, s3_folder):
   print(bucket_name, s3_folder)
   s3 = boto3.client('s3')
   today = datetime.datetime.now()
   last_monday = today - timedelta(days=today.weekday())
   week = last_monday.strftime('%Y-%m-%d')
   print(f'week: {week}')
-  week_folder = s3_folder + week
+  week_folder = os.path.join(s3_folder, week)
+  print(f'week folder: {week_folder}')
+
   try:
     s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=week_folder)
     if 'Contents' not in s3_objects:
       print('No objects found in the S3 bucket path. Creating week directory.')
       s3.put_object(Bucket=bucket_name, Key=week_folder)
-    print(f'Uploading {file_name} to {bucket_name}, {week_folder}')
-    s3.upload_file(file_name, bucket_name, week_folder + file_name)
+      print('Folder created')
+
+    print(f'Uploading {file_name} to {bucket_name}, as {os.path.join(week_folder, file_name)}')
+    s3.upload_file(file_name, bucket_name, os.path.join(week_folder, file_name))
     print('Upload complete')
   except NoCredentialsError:
     print('No AWS credentials found.')
@@ -80,11 +84,11 @@ print('Checking bucket...')
 selected_image = get_images_from_s3(bucket_name, s3_folder='articles/', min_size_kb=30)
 
 if selected_image is None:
-    print("No suitable image files found.")
-    sys.exit()
+  print("No suitable image files found.")
+  sys.exit()
 else:
-    print('Opening...')
-    img = Image.open('./' + selected_image)
+  print('Opening...')
+  img = Image.open('./' + selected_image)
 
 # create API client
 api = webuiapi.WebUIApi()
@@ -96,17 +100,16 @@ api = webuiapi.WebUIApi(host='0.0.0.0',
                         sampler='Euler a',
                         steps=20)
 
-
 api.util_wait_for_ready(check_interval=5.0)
 
 pos_prompt = "in the style of <lora:medieval_nocap_14repeats_v5-000019:1.1> (ohnx medieval)," \
              "drawing, painting, colorful"
 
 negative_prompt = "deformed, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb," \
-                " ugly, disgusting, poorly drawn hands, missing limb, floating limbs," \
-                " disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), " \
-                "watermark, watermarked, oversaturated, censored," \
-                "distorted hands, amputation, missing hands, obese, doubled face, double hands"
+                  " ugly, disgusting, poorly drawn hands, missing limb, floating limbs," \
+                  " disconnected limbs, malformed hands, blurry, ((((mutated hands and fingers)))), " \
+                  "watermark, watermarked, oversaturated, censored," \
+                  "distorted hands, amputation, missing hands, obese, doubled face, double hands"
 
 print('Running interrogation...')
 result = (api.interrogate(img))
@@ -117,17 +120,17 @@ print(pos_prompt)
 
 print('Running generation')
 result = api.img2img(prompt=pos_prompt,
-                    negative_prompt=negative_prompt,
-                    images=[img],
-                    width=512,
-                    height=512,
-                    sampler_name="Euler a",
-                    cfg_scale=7,
-                    seed=1231,
-                    denoising_strength=6.5
-                   )
+                     negative_prompt=negative_prompt,
+                     images=[img],
+                     width=512,
+                     height=512,
+                     sampler_name="Euler a",
+                     cfg_scale=7,
+                     seed=1231,
+                     denoising_strength=6.5
+                     )
 
 print('Generation complete, save locally')
 result.image.save(f"./{selected_image}")
-print('Saved. Uploading to S3')
-upload_image_to_s3(bucket_name, s3_folder='outputs/')
+print(f'Saved {selected_image}. Uploading to S3')
+upload_image_to_s3(bucket_name=bucket_name, file_name=selected_image, s3_folder='outputs/')
