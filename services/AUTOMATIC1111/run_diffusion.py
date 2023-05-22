@@ -14,14 +14,12 @@ def get_images_from_s3(bucket_name, s3_folder, min_size_kb):
   print(bucket_name, s3_folder, min_size_kb)
   image_files = []
   s3 = boto3.client('s3')
-  today = datetime.datetime.now()
-  last_monday = today - timedelta(days=today.weekday())
-  week = last_monday.strftime('%Y-%m-%d')
+  today = datetime.datetime.now().strftime('%Y-%m-%d')
 
-  print(f'week: {week}')
+  print(f'today: {today}')
   try:
-    print(f'Prefix: {s3_folder + week + "/images/"}')
-    s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=s3_folder + week + "/images/")
+    print(f'Prefix: {s3_folder + today + "/images/"}')
+    s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=s3_folder + today + "/images/")
 
     if 'Contents' not in s3_objects:
       print('No objects found in the S3 bucket path.')
@@ -39,7 +37,7 @@ def get_images_from_s3(bucket_name, s3_folder, min_size_kb):
             # print(f'Downloaded {filename} from S3 bucket {bucket_name}.')
 
     if not image_files:
-      print(f'No images found in {s3_folder + week + "/"}')
+      print(f'No images found in {s3_folder + today + "/"}')
       return None
 
   except NoCredentialsError:
@@ -56,22 +54,20 @@ def get_images_from_s3(bucket_name, s3_folder, min_size_kb):
 def upload_image_to_s3(bucket_name, file_name, s3_folder):
   print(bucket_name, s3_folder)
   s3 = boto3.client('s3')
-  today = datetime.datetime.now()
-  last_monday = today - timedelta(days=today.weekday())
-  week = last_monday.strftime('%Y-%m-%d')
-  print(f'week: {week}')
-  week_folder = os.path.join(s3_folder, week)
-  print(f'week folder: {week_folder}')
+  today = datetime.datetime.now().strftime('%Y-%m-%d')
+  print(f'date: {today}')
+  day_folder = os.path.join(s3_folder, today)
+  print(f'date folder: {day_folder}')
 
   try:
-    s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=week_folder)
+    s3_objects = s3.list_objects_v2(Bucket=bucket_name, Prefix=day_folder)
     if 'Contents' not in s3_objects:
-      print('No objects found in the S3 bucket path. Creating week directory.')
-      s3.put_object(Bucket=bucket_name, Key=week_folder)
+      print('No objects found in the S3 bucket path. Creating directory.')
+      s3.put_object(Bucket=bucket_name, Key=day_folder)
       print('Folder created')
 
-    print(f'Uploading {file_name} to {bucket_name}, as {os.path.join(week_folder, file_name)}')
-    s3.upload_file(file_name, bucket_name, os.path.join(week_folder, file_name))
+    print(f'Uploading {file_name} to {bucket_name}, as {os.path.join(day_folder, file_name)}')
+    s3.upload_file(file_name, bucket_name, os.path.join(day_folder, file_name))
     print('Upload complete')
   except NoCredentialsError:
     print('No AWS credentials found.')
