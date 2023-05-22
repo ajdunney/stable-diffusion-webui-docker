@@ -96,4 +96,4 @@ EXPOSE 7860
 
 ENTRYPOINT ["/docker/entrypoint.sh"]
 
-CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 300 && python /docker/run_diffusion.py
+CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 10 && python /docker/run_diffusion.py
