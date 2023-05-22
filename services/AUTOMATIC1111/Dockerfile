@@ -67,8 +67,6 @@ ENV LD_PRELOAD=libtcmalloc.so
 ARG SHA=89f9faa63388756314e8a1d96cf86bf5e0663045
 RUN --mount=type=cache,target=/root/.cache/pip \
   cd stable-diffusion-webui && \
-  git fetch && \
-  git reset --hard ${SHA} && \
   pip install -r requirements_versions.txt
 
 RUN --mount=type=cache,target=/root/.cache/pip  pip install -U opencv-python-headless
@@ -98,4 +96,4 @@ EXPOSE 7860
 
 ENTRYPOINT ["/docker/entrypoint.sh"]
 
-CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 30 && python /docker/run_diffusion.py
+CMD python -u webui.py --api --no-half --use-cpu all --nowebui --listen --port 7860 ${CLI_ARGS} & sleep 300 && python /docker/run_diffusion.py
